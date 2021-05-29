@@ -161,7 +161,7 @@ func PosAfterCollision(massA, massB float64, posA, posB pixel.Vec) pixel.Vec {
 	return posC
 }
 
-// Conservation of radius (as we operate in 2D)
+// Conservation of area (as we operate in 2D)
 func RadiusAfterCollision(radiusA, radiusB float64) float64 {
 	radiusC := math.Sqrt(math.Pow(radiusA, 2) + math.Pow(radiusB, 2))
 
