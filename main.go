@@ -4,18 +4,21 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/joksas/gravity/objects"
 	"golang.org/x/image/colornames"
 )
 
-type body struct {
-	pos    pixel.Vec
-	radius float64
+type Body struct {
+	Pos    pixel.Vec
+	Radius float64
 }
 
 func run() {
+	screenWidth := 500.0
+	screenHeight := 500.0
 	cfg := pixelgl.WindowConfig{
 		Title:  "Gravity",
-		Bounds: pixel.R(0, 0, 500, 500),
+		Bounds: pixel.R(0, 0, screenWidth, screenHeight),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -23,14 +26,13 @@ func run() {
 		panic(err)
 	}
 
-	body := body{
-		pos:    pixel.V(10, 10),
-		radius: 10,
-	}
+	bodies := objects.InitializeBodies(100, screenWidth, screenHeight, 5)
 	imd := imdraw.New(nil)
 	imd.Color = colornames.White
-	imd.Push(body.pos)
-	imd.Circle(body.radius, 0)
+	for _, body := range bodies {
+		imd.Push(body.Pos)
+		imd.Circle(body.Radius, 0)
+	}
 
 	for !win.Closed() {
 		win.Clear(colornames.Black)
