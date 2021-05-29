@@ -14,6 +14,7 @@ type Body struct {
 	Pos    pixel.Vec
 	Vel    pixel.Vec
 	Radius float64
+	Mass   float64
 }
 
 type Bodies []*Body
@@ -26,6 +27,7 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 		body := &Body{
 			Pos:    pixel.V(xPos, yPos),
 			Radius: radius,
+			Mass:   1,
 		}
 		bodies = append(bodies, body)
 	}
@@ -37,14 +39,19 @@ func (bodies Bodies) UpdateVelocities(dt float64) {
 		for _, bodyB := range bodies[idxA+1:] {
 			diff := Difference(bodyB.Pos, bodyA.Pos)
 			dist := Distance(diff)
-			forceLen := G / math.Pow(dist, 2)
-			// Force of B on A.
-			forceBA := diff.Unit().Scaled(forceLen)
+			// Force magnitude with masses set to 1 (for more
+			// efficient calculation).
+			unitMassForceLen := G * bodyA.Mass * bodyB.Mass / math.Pow(dist, 2)
+			// Force of B on A (with unit masses).
+			unitMassForceBA := diff.Unit().Scaled(unitMassForceLen)
 
-			velDiffA := forceBA.Scaled(dt)
+			// Change in velocity (with unit masses).
+			unitMassVelDiffA := unitMassForceBA.Scaled(dt)
+			velDiffA := unitMassVelDiffA.Scaled(bodyB.Mass)
 			bodyA.Vel = bodyA.Vel.Add(velDiffA)
 
-			velDiffB := velDiffA.Scaled(-1)
+			unitMassVelDiffB := unitMassVelDiffA.Scaled(-1)
+			velDiffB := unitMassVelDiffB.Scaled(bodyA.Mass)
 			bodyB.Vel = bodyB.Vel.Add(velDiffB)
 		}
 	}
