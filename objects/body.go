@@ -10,7 +10,7 @@ import (
 	"gonum.org/v1/plot/palette/moreland"
 )
 
-const G = 30
+const G = 100
 
 type Body struct {
 	Pos    pixel.Vec
@@ -75,7 +75,7 @@ func (bodies Bodies) UpdateColors() {
 	for _, body := range bodies {
 		speed := body.Vel.Len()
 		// Something to determine which color to pick.
-		fastness := speed / 20
+		fastness := speed / 100
 		if fastness > 1 {
 			fastness = 1
 		}

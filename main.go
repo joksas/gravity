@@ -30,6 +30,7 @@ func run() {
 	for !win.Closed() {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
+		dt /= 5
 
 		bodies = bodies.RemoveClose()
 		bodies.UpdateVelocities(dt)
