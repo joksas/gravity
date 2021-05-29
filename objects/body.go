@@ -32,7 +32,7 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 	return
 }
 
-func UpdateVelocities(bodies []*Body, dt float64) {
+func (bodies Bodies) UpdateVelocities(dt float64) {
 	for idxA, bodyA := range bodies[:len(bodies)-1] {
 		for _, bodyB := range bodies[idxA+1:] {
 			diff := Difference(bodyB.Pos, bodyA.Pos)

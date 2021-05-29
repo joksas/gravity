@@ -38,7 +38,7 @@ func run() {
 		last = time.Now()
 
 		imd.Clear()
-		objects.UpdateVelocities(bodies, dt)
+		bodies.UpdateVelocities(dt)
 		bodies.UpdatePositions(dt)
 		for _, body := range bodies {
 			imd.Push(body.Pos)
