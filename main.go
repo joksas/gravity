@@ -16,8 +16,8 @@ type Body struct {
 }
 
 func run() {
-	screenWidth := 500.0
-	screenHeight := 500.0
+	screenWidth := 1000.0
+	screenHeight := 700.0
 	cfg := pixelgl.WindowConfig{
 		Title:  "Gravity",
 		Bounds: pixel.R(0, 0, screenWidth, screenHeight),
@@ -28,7 +28,7 @@ func run() {
 		panic(err)
 	}
 
-	bodies := objects.InitializeBodies(100, screenWidth, screenHeight, 5)
+	bodies := objects.InitializeBodies(300, screenWidth, screenHeight, 1)
 	imd := imdraw.New(nil)
 	imd.Color = colornames.White
 
@@ -37,9 +37,11 @@ func run() {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 
-		imd.Clear()
+		bodies = bodies.RemoveClose()
 		bodies.UpdateVelocities(dt)
 		bodies.UpdatePositions(dt)
+
+		imd.Clear()
 		for _, body := range bodies {
 			imd.Push(body.Pos)
 			imd.Circle(body.Radius, 0)
