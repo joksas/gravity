@@ -38,6 +38,7 @@ func run() {
 		last = time.Now()
 
 		imd.Clear()
+		objects.UpdateVelocities(bodies, dt)
 		for _, body := range bodies {
 			displacement := body.Vel.Scaled(dt)
 			body.Pos = body.Pos.Add(displacement)
