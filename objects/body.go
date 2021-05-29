@@ -16,7 +16,9 @@ type Body struct {
 	Radius float64
 }
 
-func InitializeBodies(N int, xMax, yMax, radius float64) (bodies []*Body) {
+type Bodies []*Body
+
+func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < N; i++ {
 		xPos := rand.Float64() * xMax
@@ -45,6 +47,13 @@ func UpdateVelocities(bodies []*Body, dt float64) {
 			velDiffB := velDiffA.Scaled(-1)
 			bodyB.Vel = bodyB.Vel.Add(velDiffB)
 		}
+	}
+}
+
+func (bodies Bodies) UpdatePositions(dt float64) {
+	for _, body := range bodies {
+		displacement := body.Vel.Scaled(dt)
+		body.Pos = body.Pos.Add(displacement)
 	}
 }
 
