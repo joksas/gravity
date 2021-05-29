@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -29,12 +31,20 @@ func run() {
 	bodies := objects.InitializeBodies(100, screenWidth, screenHeight, 5)
 	imd := imdraw.New(nil)
 	imd.Color = colornames.White
-	for _, body := range bodies {
-		imd.Push(body.Pos)
-		imd.Circle(body.Radius, 0)
-	}
 
+	last := time.Now()
 	for !win.Closed() {
+		dt := time.Since(last).Seconds()
+		last = time.Now()
+
+		imd.Clear()
+		for _, body := range bodies {
+			displacement := body.Vel.Scaled(dt)
+			body.Pos = body.Pos.Add(displacement)
+			imd.Push(body.Pos)
+			imd.Circle(body.Radius, 0)
+		}
+
 		win.Clear(colornames.Black)
 		imd.Draw(win)
 		win.Update()
