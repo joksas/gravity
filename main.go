@@ -10,11 +10,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-type Body struct {
-	Pos    pixel.Vec
-	Radius float64
-}
-
 func run() {
 	screenWidth := 1000.0
 	screenHeight := 700.0
