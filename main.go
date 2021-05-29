@@ -25,7 +25,6 @@ func run() {
 
 	bodies := objects.InitializeBodies(300, screenWidth, screenHeight, 1)
 	imd := imdraw.New(nil)
-	imd.Color = colornames.White
 
 	last := time.Now()
 	for !win.Closed() {
@@ -35,9 +34,11 @@ func run() {
 		bodies = bodies.RemoveClose()
 		bodies.UpdateVelocities(dt)
 		bodies.UpdatePositions(dt)
+		bodies.UpdateColors()
 
 		imd.Clear()
 		for _, body := range bodies {
+			imd.Color = body.Color
 			imd.Push(body.Pos)
 			imd.Circle(body.Radius, 0)
 		}

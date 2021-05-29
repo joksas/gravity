@@ -1,11 +1,13 @@
 package objects
 
 import (
+	"image/color"
 	"math"
 	"math/rand"
 	"time"
 
 	"github.com/faiface/pixel"
+	"gonum.org/v1/plot/palette/moreland"
 )
 
 const G = 30
@@ -15,6 +17,7 @@ type Body struct {
 	Vel    pixel.Vec
 	Radius float64
 	Mass   float64
+	Color  color.Color
 }
 
 type Bodies []*Body
@@ -61,6 +64,29 @@ func (bodies Bodies) UpdatePositions(dt float64) {
 	for _, body := range bodies {
 		displacement := body.Vel.Scaled(dt)
 		body.Pos = body.Pos.Add(displacement)
+	}
+}
+
+func (bodies Bodies) UpdateColors() {
+	palette := moreland.BlackBody()
+	palette.SetMin(0)
+	palette.SetMax(1)
+
+	for _, body := range bodies {
+		speed := body.Vel.Len()
+		// Something to determine which color to pick.
+		fastness := speed / 20
+		if fastness > 1 {
+			fastness = 1
+		}
+		if fastness < 0.1 {
+			fastness = 0.1
+		}
+		var err error
+		body.Color, err = palette.At(fastness)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
