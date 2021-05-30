@@ -119,23 +119,26 @@ func (bodies Bodies) RemoveClose() Bodies {
 		var newBodies Bodies
 		for _, mergeGroup := range mergeGroups {
 			firstBody := bodies[mergeGroup[0]]
-			mergedPos := firstBody.Pos
-			mergedVel := firstBody.Vel
-			mergedRadius := firstBody.Radius
-			mergedMass := firstBody.Mass
-			for _, newBodyIdx := range mergeGroup[1:] {
-				newBody := bodies[newBodyIdx]
-				mergedPos = PosAfterCollision(mergedMass, newBody.Mass, mergedPos, newBody.Pos)
-				mergedVel = VelAfterCollision(mergedMass, newBody.Mass, mergedVel, newBody.Vel)
-				mergedRadius = RadiusAfterCollision(mergedRadius, newBody.Radius)
-				mergedMass += newBody.Mass
+
+			newPos := firstBody.Pos
+			newVel := firstBody.Vel
+			newRadius := firstBody.Radius
+			newMass := firstBody.Mass
+			for _, nextBodyIdx := range mergeGroup[1:] {
+				nextBody := bodies[nextBodyIdx]
+
+				newPos = PosAfterCollision(newMass, nextBody.Mass, newPos, nextBody.Pos)
+				newVel = VelAfterCollision(newMass, nextBody.Mass, newVel, nextBody.Vel)
+				newRadius = RadiusAfterCollision(newRadius, nextBody.Radius)
+				newMass += nextBody.Mass
 			}
-			newBodies = append(newBodies, &Body{
-				Pos:    mergedPos,
-				Vel:    mergedVel,
-				Radius: mergedRadius,
-				Mass:   mergedMass,
-			})
+			newBody := &Body{
+				Pos:    newPos,
+				Vel:    newVel,
+				Radius: newRadius,
+				Mass:   newMass,
+			}
+			newBodies = append(newBodies, newBody)
 		}
 		return newBodies
 	} else {
