@@ -93,41 +93,41 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 	}
 
 	if len(mergeGroups) < len(bodies) {
-		var newBodies Bodies
-		var newFireballs Fireballs
+		var updatedBodies Bodies
+		var updatedFireballs Fireballs
 		for _, mergeGroup := range mergeGroups {
 			var mergedBodies []*Body
 
 			firstBody := bodies[mergeGroup[0]]
 			mergedBodies = append(mergedBodies, firstBody)
 
-			newPos := firstBody.Pos
-			newVel := firstBody.Vel
-			newRadius := firstBody.Radius
-			newMass := firstBody.Mass
-			newColor := firstBody.Color
+			updatedPos := firstBody.Pos
+			updatedVel := firstBody.Vel
+			updatedRadius := firstBody.Radius
+			updatedMass := firstBody.Mass
+			updatedColor := firstBody.Color
 			for _, nextBodyIdx := range mergeGroup[1:] {
 				nextBody := bodies[nextBodyIdx]
 				mergedBodies = append(mergedBodies, nextBody)
 
-				newPos = PosAfterCollision(newMass, nextBody.Mass, newPos, nextBody.Pos)
-				newVel = VelAfterCollision(newMass, nextBody.Mass, newVel, nextBody.Vel)
-				newRadius = RadiusAfterCollision(newRadius, nextBody.Radius)
-				newMass = MassAfterCollision(newMass, nextBody.Mass)
-				newColor = ColorAfterCollision(newMass, nextBody.Mass, newColor, nextBody.Color)
+				updatedPos = PosAfterCollision(updatedMass, nextBody.Mass, updatedPos, nextBody.Pos)
+				updatedVel = VelAfterCollision(updatedMass, nextBody.Mass, updatedVel, nextBody.Vel)
+				updatedRadius = RadiusAfterCollision(updatedRadius, nextBody.Radius)
+				updatedMass = MassAfterCollision(updatedMass, nextBody.Mass)
+				updatedColor = ColorAfterCollision(updatedMass, nextBody.Mass, updatedColor, nextBody.Color)
 			}
-			newBody := &Body{
-				Pos:    newPos,
-				Vel:    newVel,
-				Radius: newRadius,
-				Mass:   newMass,
-				Color:  newColor,
+			updatedBody := &Body{
+				Pos:    updatedPos,
+				Vel:    updatedVel,
+				Radius: updatedRadius,
+				Mass:   updatedMass,
+				Color:  updatedColor,
 			}
-			newBodies = append(newBodies, newBody)
-			fireballs := CreateFireballs(mergedBodies)
-			newFireballs = append(newFireballs, fireballs...)
+			updatedBodies = append(updatedBodies, updatedBody)
+			newFireballs := CreateFireballs(mergedBodies)
+			updatedFireballs = append(updatedFireballs, newFireballs...)
 		}
-		return newBodies, append(fireballs, newFireballs...)
+		return updatedBodies, append(fireballs, updatedFireballs...)
 	} else {
 		return bodies, fireballs
 	}

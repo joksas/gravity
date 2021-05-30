@@ -61,22 +61,22 @@ func CreateFireballs(mergedBodies []*Body) Fireballs {
 	}
 	heaviestBody := mergedBodies[heaviestBodyIdx]
 
-	var fireballs Fireballs
+	var newFireballs Fireballs
 	for idx, body := range mergedBodies {
 		if idx == heaviestBodyIdx {
 			continue
 		}
 		pos := FireballPos(body.Pos, heaviestBody.Pos, body.Radius, heaviestBody.Radius)
 		radius := FireballRadius(body.Mass, heaviestBody.Mass, body.Vel, heaviestBody.Vel)
-		fireball := &Fireball{
+		newFireball := &Fireball{
 			Pos:            pos,
 			Radius:         radius,
 			IterationsLeft: FireballLifetime,
 		}
-		fireballs = append(fireballs, fireball)
+		newFireballs = append(newFireballs, newFireball)
 	}
 
-	return fireballs
+	return newFireballs
 }
 
 func FireballPos(posA, posB pixel.Vec, radiusA, radiusB float64) pixel.Vec {
