@@ -113,7 +113,7 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 				newPos = PosAfterCollision(newMass, nextBody.Mass, newPos, nextBody.Pos)
 				newVel = VelAfterCollision(newMass, nextBody.Mass, newVel, nextBody.Vel)
 				newRadius = RadiusAfterCollision(newRadius, nextBody.Radius)
-				newMass += nextBody.Mass
+				newMass = MassAfterCollision(newMass, nextBody.Mass)
 				newColor = ColorAfterCollision(newMass, nextBody.Mass, newColor, nextBody.Color)
 			}
 			newBody := &Body{
@@ -156,6 +156,12 @@ func RadiusAfterCollision(radiusA, radiusB float64) float64 {
 	radiusC := math.Sqrt(math.Pow(radiusA, 2) + math.Pow(radiusB, 2))
 
 	return radiusC
+}
+
+// Conservation of mass
+func MassAfterCollision(massA, massB float64) float64 {
+	massC := massA + massB
+	return massC
 }
 
 // Not completely sure if this is the best approach, but I adapted
