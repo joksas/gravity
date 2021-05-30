@@ -4,7 +4,6 @@ import (
 	"image/color"
 	"math"
 	"math/rand"
-	"time"
 
 	"github.com/faiface/pixel"
 )
@@ -22,29 +21,16 @@ type Body struct {
 type Bodies []*Body
 
 func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
-	// [Colors of solar system planets](https://astronomy.stackexchange.com/a/14040)
-	colors := []color.Color{
-		color.RGBA{26, 26, 26, 255},
-		color.RGBA{230, 230, 230, 255},
-		color.RGBA{47, 106, 105, 255},
-		color.RGBA{153, 61, 0, 255},
-		color.RGBA{176, 127, 23, 255},
-		color.RGBA{176, 143, 54, 255},
-		color.RGBA{85, 128, 170, 255},
-		color.RGBA{54, 104, 150, 255},
-	}
-	rand.Seed(time.Now().UnixNano())
-
+	colorChooser := CreateColorChooser()
 	for i := 0; i < N; i++ {
 		xPos := rand.Float64() * xMax
 		yPos := rand.Float64() * yMax
-		colorIdx := rand.Intn(len(colors))
-		color := colors[colorIdx]
+		color := colorChooser.Pick().(color.Color)
 		body := &Body{
 			Pos:    pixel.V(xPos, yPos),
 			Radius: radius,
 			Mass:   1,
-			Color:  pixel.ToRGBA(color),
+			Color:  color,
 		}
 		bodies = append(bodies, body)
 	}
