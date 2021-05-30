@@ -11,12 +11,11 @@ import (
 )
 
 func run() {
-	screenWidth := 1000.0
-	screenHeight := 700.0
+	screenWidth, screenHeight := pixelgl.PrimaryMonitor().Size()
 	cfg := pixelgl.WindowConfig{
-		Title:  "Gravity",
-		Bounds: pixel.R(0, 0, screenWidth, screenHeight),
-		VSync:  true,
+		Bounds:  pixel.R(0, 0, screenWidth, screenHeight),
+		VSync:   true,
+		Monitor: pixelgl.PrimaryMonitor(),
 	}
 	win, err := pixelgl.NewWindow(cfg)
 	if err != nil {
