@@ -36,7 +36,7 @@ func CreateColorChooser() *weightedrand.Chooser {
 		// We use exponential weights so that certain colors
 		// dominate, and we don't get a boring gray mass in the
 		// end. This does still happen sometimes though...
-		weight := uint(math.Pow(2, float64(rand.Intn(20))))
+		weight := uint(math.Pow(2, float64(rand.Intn(15))))
 		colorChoices = append(colorChoices, weightedrand.Choice{
 			Item:   color,
 			Weight: weight,
