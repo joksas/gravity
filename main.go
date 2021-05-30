@@ -36,7 +36,6 @@ func run() {
 		bodies, fireballs = bodies.RemoveClose(fireballs)
 		bodies.UpdateVelocities(dt)
 		bodies.UpdatePositions(dt)
-		bodies.UpdateColors()
 		fireballs = fireballs.Update()
 
 		imd.Clear()

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/faiface/pixel"
-	"gonum.org/v1/plot/palette/moreland"
+	"golang.org/x/image/colornames"
 )
 
 const G = 100
@@ -31,6 +31,7 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 			Pos:    pixel.V(xPos, yPos),
 			Radius: radius,
 			Mass:   1,
+			Color:  colornames.Gray,
 		}
 		bodies = append(bodies, body)
 	}
@@ -64,29 +65,6 @@ func (bodies Bodies) UpdatePositions(dt float64) {
 	for _, body := range bodies {
 		displacement := body.Vel.Scaled(dt)
 		body.Pos = body.Pos.Add(displacement)
-	}
-}
-
-func (bodies Bodies) UpdateColors() {
-	palette := moreland.BlackBody()
-	palette.SetMin(0)
-	palette.SetMax(1)
-
-	for _, body := range bodies {
-		speed := body.Vel.Len()
-		// Something to determine which color to pick.
-		fastness := speed / 100
-		if fastness > 1 {
-			fastness = 1
-		}
-		if fastness < 0.1 {
-			fastness = 0.1
-		}
-		var err error
-		body.Color, err = palette.At(fastness)
-		if err != nil {
-			panic(err)
-		}
 	}
 }
 
@@ -142,6 +120,7 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 				Vel:    newVel,
 				Radius: newRadius,
 				Mass:   newMass,
+				Color:  colornames.Gray,
 			}
 			newBodies = append(newBodies, newBody)
 			fireballs := CreateFireballs(mergedBodies)
