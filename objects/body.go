@@ -185,9 +185,9 @@ func ColorAfterCollision(massA, massB float64, colorA, colorB color.Color) color
 	combinedMass := massA + massB
 	squaredContents := term1.Add(term2).Scaled(1 / combinedMass)
 	r := math.Sqrt(squaredContents.R)
-	b := math.Sqrt(squaredContents.B)
 	g := math.Sqrt(squaredContents.G)
-	color := pixel.RGBA{r, b, g, 255}
+	b := math.Sqrt(squaredContents.B)
+	color := pixel.RGBA{R: r, G: g, B: b, A: 255}
 	return color
 }
 
