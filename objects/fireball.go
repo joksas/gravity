@@ -5,7 +5,7 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
-	"golang.org/x/image/colornames"
+	"gonum.org/v1/plot/palette/moreland"
 )
 
 const FireballLifetime = 100
@@ -20,15 +20,27 @@ type Fireball struct {
 type Fireballs []*Fireball
 
 func (fireballs Fireballs) Update() Fireballs {
+	palette := moreland.BlackBody()
+	palette.SetMin(0)
+	palette.SetMax(1)
+
 	var newFireballs Fireballs
 	for _, fireball := range fireballs {
 		if fireball.IterationsLeft > 0 {
 			fireball.Radius *= 1 + 1/float64(FireballLifetime)
+
 			// Intensity will decrease with inverse square.
 			intensity := math.Pow(float64(fireball.IterationsLeft)/FireballLifetime, 2)
-			color := pixel.ToRGBA(colornames.White).Mul(pixel.Alpha(intensity))
+			tempColor, err := palette.At(intensity)
+			if err != nil {
+				panic(err)
+			}
+			color := pixel.ToRGBA(tempColor)
+			color = color.Mul(pixel.Alpha(intensity))
 			fireball.Color = color
+
 			fireball.IterationsLeft -= 1
+
 			newFireballs = append(newFireballs, fireball)
 		}
 	}
@@ -59,7 +71,6 @@ func CreateFireballs(mergedBodies []*Body) Fireballs {
 		fireball := &Fireball{
 			Pos:            pos,
 			Radius:         radius,
-			Color:          pixel.ToRGBA(colornames.White),
 			IterationsLeft: FireballLifetime,
 		}
 		fireballs = append(fireballs, fireball)
