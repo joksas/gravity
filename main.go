@@ -24,6 +24,7 @@ func run() {
 	}
 
 	bodies := objects.InitializeBodies(300, screenWidth, screenHeight, 1)
+	var fireballs objects.Fireballs
 	imd := imdraw.New(nil)
 
 	last := time.Now()
@@ -32,16 +33,23 @@ func run() {
 		last = time.Now()
 		dt /= 5
 
-		bodies = bodies.RemoveClose()
+		bodies, fireballs = bodies.RemoveClose(fireballs)
 		bodies.UpdateVelocities(dt)
 		bodies.UpdatePositions(dt)
 		bodies.UpdateColors()
+		fireballs = fireballs.Update()
 
 		imd.Clear()
 		for _, body := range bodies {
 			imd.Color = body.Color
 			imd.Push(body.Pos)
 			imd.Circle(body.Radius, 0)
+		}
+
+		for _, fireball := range fireballs {
+			imd.Color = fireball.Color
+			imd.Push(fireball.Pos)
+			imd.Circle(fireball.Radius, 0)
 		}
 
 		win.Clear(colornames.Black)

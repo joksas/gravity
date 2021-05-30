@@ -90,7 +90,7 @@ func (bodies Bodies) UpdateColors() {
 	}
 }
 
-func (bodies Bodies) RemoveClose() Bodies {
+func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 	var mergeGroups [][]int
 	var mergedIdxs []int
 	for idxA, bodyA := range bodies {
@@ -117,8 +117,12 @@ func (bodies Bodies) RemoveClose() Bodies {
 
 	if len(mergeGroups) < len(bodies) {
 		var newBodies Bodies
+		var newFireballs Fireballs
 		for _, mergeGroup := range mergeGroups {
+			var mergedBodies []*Body
+
 			firstBody := bodies[mergeGroup[0]]
+			mergedBodies = append(mergedBodies, firstBody)
 
 			newPos := firstBody.Pos
 			newVel := firstBody.Vel
@@ -126,6 +130,7 @@ func (bodies Bodies) RemoveClose() Bodies {
 			newMass := firstBody.Mass
 			for _, nextBodyIdx := range mergeGroup[1:] {
 				nextBody := bodies[nextBodyIdx]
+				mergedBodies = append(mergedBodies, nextBody)
 
 				newPos = PosAfterCollision(newMass, nextBody.Mass, newPos, nextBody.Pos)
 				newVel = VelAfterCollision(newMass, nextBody.Mass, newVel, nextBody.Vel)
@@ -139,10 +144,12 @@ func (bodies Bodies) RemoveClose() Bodies {
 				Mass:   newMass,
 			}
 			newBodies = append(newBodies, newBody)
+			fireballs := CreateFireballs(mergedBodies)
+			newFireballs = append(newFireballs, fireballs...)
 		}
-		return newBodies
+		return newBodies, append(fireballs, newFireballs...)
 	} else {
-		return bodies
+		return bodies, fireballs
 	}
 }
 
