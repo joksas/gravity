@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/faiface/pixel"
-	"golang.org/x/image/colornames"
 )
 
 const G = 100
@@ -23,15 +22,29 @@ type Body struct {
 type Bodies []*Body
 
 func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
+	// [Colors of solar system planets](https://astronomy.stackexchange.com/a/14040)
+	colors := []color.Color{
+		color.RGBA{26, 26, 26, 255},
+		color.RGBA{230, 230, 230, 255},
+		color.RGBA{47, 106, 105, 255},
+		color.RGBA{153, 61, 0, 255},
+		color.RGBA{176, 127, 23, 255},
+		color.RGBA{176, 143, 54, 255},
+		color.RGBA{85, 128, 170, 255},
+		color.RGBA{54, 104, 150, 255},
+	}
 	rand.Seed(time.Now().UnixNano())
+
 	for i := 0; i < N; i++ {
 		xPos := rand.Float64() * xMax
 		yPos := rand.Float64() * yMax
+		colorIdx := rand.Intn(len(colors))
+		color := colors[colorIdx]
 		body := &Body{
 			Pos:    pixel.V(xPos, yPos),
 			Radius: radius,
 			Mass:   1,
-			Color:  colornames.Gray,
+			Color:  pixel.ToRGBA(color),
 		}
 		bodies = append(bodies, body)
 	}
@@ -106,6 +119,7 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 			newVel := firstBody.Vel
 			newRadius := firstBody.Radius
 			newMass := firstBody.Mass
+			newColor := firstBody.Color
 			for _, nextBodyIdx := range mergeGroup[1:] {
 				nextBody := bodies[nextBodyIdx]
 				mergedBodies = append(mergedBodies, nextBody)
@@ -114,13 +128,14 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 				newVel = VelAfterCollision(newMass, nextBody.Mass, newVel, nextBody.Vel)
 				newRadius = RadiusAfterCollision(newRadius, nextBody.Radius)
 				newMass += nextBody.Mass
+				newColor = ColorAfterCollision(newMass, nextBody.Mass, newColor, nextBody.Color)
 			}
 			newBody := &Body{
 				Pos:    newPos,
 				Vel:    newVel,
 				Radius: newRadius,
 				Mass:   newMass,
-				Color:  colornames.Gray,
+				Color:  newColor,
 			}
 			newBodies = append(newBodies, newBody)
 			fireballs := CreateFireballs(mergedBodies)
@@ -155,6 +170,25 @@ func RadiusAfterCollision(radiusA, radiusB float64) float64 {
 	radiusC := math.Sqrt(math.Pow(radiusA, 2) + math.Pow(radiusB, 2))
 
 	return radiusC
+}
+
+// Not completely sure if this is the best approach, but I adapted
+// [this](https://www.youtube.com/watch?v=LKnqECcg6Gw) to our scenario, where
+// we also weigh the two colors by their masses.
+func ColorAfterCollision(massA, massB float64, colorA, colorB color.Color) color.Color {
+	pixelColorA := pixel.ToRGBA(colorA)
+	pixelColorA2 := pixelColorA.Mul(pixelColorA)
+	pixelColorB := pixel.ToRGBA(colorB)
+	pixelColorB2 := pixelColorB.Mul(pixelColorB)
+	term1 := pixelColorA2.Scaled(massA)
+	term2 := pixelColorB2.Scaled(massB)
+	combinedMass := massA + massB
+	squaredContents := term1.Add(term2).Scaled(1 / combinedMass)
+	r := math.Sqrt(squaredContents.R)
+	b := math.Sqrt(squaredContents.B)
+	g := math.Sqrt(squaredContents.G)
+	color := pixel.RGBA{r, b, g, 255}
+	return color
 }
 
 func Difference(posA, posB pixel.Vec) pixel.Vec {
