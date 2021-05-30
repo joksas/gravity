@@ -37,6 +37,14 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 	return
 }
 
+func (bodies Bodies) Update(dt float64, fireballs Fireballs) (Bodies, Fireballs) {
+	bodies, fireballs = bodies.RemoveClose(fireballs)
+	bodies.UpdateVelocities(dt)
+	bodies.UpdatePositions(dt)
+
+	return bodies, fireballs
+}
+
 func (bodies Bodies) UpdateVelocities(dt float64) {
 	for idxA, bodyA := range bodies[:len(bodies)-1] {
 		for _, bodyB := range bodies[idxA+1:] {

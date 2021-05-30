@@ -33,12 +33,11 @@ func run() {
 		last = time.Now()
 		dt /= 5
 
-		bodies, fireballs = bodies.RemoveClose(fireballs)
-		bodies.UpdateVelocities(dt)
-		bodies.UpdatePositions(dt)
+		bodies, fireballs = bodies.Update(dt, fireballs)
 		fireballs = fireballs.Update()
 
 		imd.Clear()
+
 		for _, body := range bodies {
 			imd.Color = body.Color
 			imd.Push(body.Pos)
