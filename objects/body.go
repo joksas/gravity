@@ -8,7 +8,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
-const G = 100
+const G = 10000
 
 type Body struct {
 	Pos    pixel.Vec
@@ -18,7 +18,7 @@ type Body struct {
 	Color  color.Color
 }
 
-type Bodies []*Body
+type Bodies []Body
 
 func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 	colorChooser := CreateColorChooser()
@@ -26,7 +26,7 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 		xPos := rand.Float64() * xMax
 		yPos := rand.Float64() * yMax
 		color := colorChooser.Pick().(color.Color)
-		body := &Body{
+		body := Body{
 			Pos:    pixel.V(xPos, yPos),
 			Radius: radius,
 			Mass:   1,
@@ -46,8 +46,10 @@ func (bodies Bodies) Update(dt float64, fireballs Fireballs) (Bodies, Fireballs)
 }
 
 func (bodies Bodies) UpdateVelocities(dt float64) {
-	for idxA, bodyA := range bodies[:len(bodies)-1] {
-		for _, bodyB := range bodies[idxA+1:] {
+	for idxA := 0; idxA < len(bodies)-1; idxA++ {
+		bodyA := &bodies[idxA]
+		for idxB := idxA + 1; idxB < len(bodies); idxB++ {
+			bodyB := &bodies[idxB]
 			diff := Difference(bodyB.Pos, bodyA.Pos)
 			dist := Distance(diff)
 			// Force magnitude with masses set to 1 (for more
@@ -69,7 +71,8 @@ func (bodies Bodies) UpdateVelocities(dt float64) {
 }
 
 func (bodies Bodies) UpdatePositions(dt float64) {
-	for _, body := range bodies {
+	for idx := 0; idx < len(bodies); idx++ {
+		body := &bodies[idx]
 		displacement := body.Vel.Scaled(dt)
 		body.Pos = body.Pos.Add(displacement)
 	}
@@ -104,7 +107,7 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 		var updatedBodies Bodies
 		var updatedFireballs Fireballs
 		for _, mergeGroup := range mergeGroups {
-			var mergedBodies []*Body
+			var mergedBodies []Body
 
 			firstBody := bodies[mergeGroup[0]]
 			mergedBodies = append(mergedBodies, firstBody)
@@ -124,7 +127,7 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 				updatedMass = MassAfterCollision(updatedMass, nextBody.Mass)
 				updatedColor = ColorAfterCollision(updatedMass, nextBody.Mass, updatedColor, nextBody.Color)
 			}
-			updatedBody := &Body{
+			updatedBody := Body{
 				Pos:    updatedPos,
 				Vel:    updatedVel,
 				Radius: updatedRadius,

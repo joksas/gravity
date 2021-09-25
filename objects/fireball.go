@@ -17,7 +17,7 @@ type Fireball struct {
 	IterationsLeft int
 }
 
-type Fireballs []*Fireball
+type Fireballs []Fireball
 
 func (fireballs Fireballs) Update() Fireballs {
 	palette := moreland.BlackBody()
@@ -25,7 +25,8 @@ func (fireballs Fireballs) Update() Fireballs {
 	palette.SetMax(1)
 
 	var newFireballs Fireballs
-	for _, fireball := range fireballs {
+	for idx := 0; idx < len(fireballs); idx++ {
+		fireball := &fireballs[idx]
 		if fireball.IterationsLeft > 0 {
 			fireball.Radius *= 1 + 1/float64(FireballLifetime)
 
@@ -41,7 +42,7 @@ func (fireballs Fireballs) Update() Fireballs {
 
 			fireball.IterationsLeft -= 1
 
-			newFireballs = append(newFireballs, fireball)
+			newFireballs = append(newFireballs, *fireball)
 		}
 	}
 
@@ -52,7 +53,7 @@ func (fireballs Fireballs) Update() Fireballs {
 	}
 }
 
-func CreateFireballs(mergedBodies []*Body) Fireballs {
+func CreateFireballs(mergedBodies []Body) Fireballs {
 	heaviestBodyIdx := 0
 	for idx, body := range mergedBodies {
 		if body.Mass > mergedBodies[heaviestBodyIdx].Mass {
@@ -68,7 +69,7 @@ func CreateFireballs(mergedBodies []*Body) Fireballs {
 		}
 		pos := FireballPos(body.Pos, heaviestBody.Pos, body.Radius, heaviestBody.Radius)
 		radius := FireballRadius(body.Mass, heaviestBody.Mass, body.Vel, heaviestBody.Vel)
-		newFireball := &Fireball{
+		newFireball := Fireball{
 			Pos:            pos,
 			Radius:         radius,
 			IterationsLeft: FireballLifetime,
