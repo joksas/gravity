@@ -20,7 +20,8 @@ type Body struct {
 
 type Bodies []Body
 
-func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
+func InitializeBodies(N int, xMax, yMax, radius float64) Bodies {
+	var bodies = make(Bodies, N)
 	colorChooser := CreateColorChooser()
 	for i := 0; i < N; i++ {
 		xPos := rand.Float64() * xMax
@@ -32,9 +33,9 @@ func InitializeBodies(N int, xMax, yMax, radius float64) (bodies Bodies) {
 			Mass:   1,
 			Color:  color,
 		}
-		bodies = append(bodies, body)
+		bodies[i] = body
 	}
-	return
+	return bodies
 }
 
 func (bodies Bodies) Update(dt float64, fireballs Fireballs) (Bodies, Fireballs) {
@@ -103,45 +104,45 @@ func (bodies Bodies) RemoveClose(fireballs Fireballs) (Bodies, Fireballs) {
 		mergedIdxs = append(mergedIdxs, mergeGroups[len(mergeGroups)-1]...)
 	}
 
-	if len(mergeGroups) < len(bodies) {
-		var updatedBodies Bodies
-		var updatedFireballs Fireballs
-		for _, mergeGroup := range mergeGroups {
-			var mergedBodies []Body
-
-			firstBody := bodies[mergeGroup[0]]
-			mergedBodies = append(mergedBodies, firstBody)
-
-			updatedPos := firstBody.Pos
-			updatedVel := firstBody.Vel
-			updatedRadius := firstBody.Radius
-			updatedMass := firstBody.Mass
-			updatedColor := firstBody.Color
-			for _, nextBodyIdx := range mergeGroup[1:] {
-				nextBody := bodies[nextBodyIdx]
-				mergedBodies = append(mergedBodies, nextBody)
-
-				updatedPos = PosAfterCollision(updatedMass, nextBody.Mass, updatedPos, nextBody.Pos)
-				updatedVel = VelAfterCollision(updatedMass, nextBody.Mass, updatedVel, nextBody.Vel)
-				updatedRadius = RadiusAfterCollision(updatedRadius, nextBody.Radius)
-				updatedMass = MassAfterCollision(updatedMass, nextBody.Mass)
-				updatedColor = ColorAfterCollision(updatedMass, nextBody.Mass, updatedColor, nextBody.Color)
-			}
-			updatedBody := Body{
-				Pos:    updatedPos,
-				Vel:    updatedVel,
-				Radius: updatedRadius,
-				Mass:   updatedMass,
-				Color:  updatedColor,
-			}
-			updatedBodies = append(updatedBodies, updatedBody)
-			newFireballs := CreateFireballs(mergedBodies)
-			updatedFireballs = append(updatedFireballs, newFireballs...)
-		}
-		return updatedBodies, append(fireballs, updatedFireballs...)
-	} else {
+	if len(mergeGroups) == len(bodies) {
 		return bodies, fireballs
 	}
+
+	var updatedBodies Bodies
+	var updatedFireballs Fireballs
+	for _, mergeGroup := range mergeGroups {
+		var mergedBodies []Body
+
+		firstBody := bodies[mergeGroup[0]]
+		mergedBodies = append(mergedBodies, firstBody)
+
+		updatedPos := firstBody.Pos
+		updatedVel := firstBody.Vel
+		updatedRadius := firstBody.Radius
+		updatedMass := firstBody.Mass
+		updatedColor := firstBody.Color
+		for _, nextBodyIdx := range mergeGroup[1:] {
+			nextBody := bodies[nextBodyIdx]
+			mergedBodies = append(mergedBodies, nextBody)
+
+			updatedPos = PosAfterCollision(updatedMass, nextBody.Mass, updatedPos, nextBody.Pos)
+			updatedVel = VelAfterCollision(updatedMass, nextBody.Mass, updatedVel, nextBody.Vel)
+			updatedRadius = RadiusAfterCollision(updatedRadius, nextBody.Radius)
+			updatedMass = MassAfterCollision(updatedMass, nextBody.Mass)
+			updatedColor = ColorAfterCollision(updatedMass, nextBody.Mass, updatedColor, nextBody.Color)
+		}
+		updatedBody := Body{
+			Pos:    updatedPos,
+			Vel:    updatedVel,
+			Radius: updatedRadius,
+			Mass:   updatedMass,
+			Color:  updatedColor,
+		}
+		updatedBodies = append(updatedBodies, updatedBody)
+		newFireballs := CreateFireballs(mergedBodies)
+		updatedFireballs = append(updatedFireballs, newFireballs...)
+	}
+	return updatedBodies, append(fireballs, updatedFireballs...)
 }
 
 // Conservation of momentum

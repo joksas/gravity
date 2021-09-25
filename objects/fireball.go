@@ -40,17 +40,17 @@ func (fireballs Fireballs) Update() Fireballs {
 			color = color.Mul(pixel.Alpha(intensity))
 			fireball.Color = color
 
-			fireball.IterationsLeft -= 1
+			fireball.IterationsLeft--
 
 			newFireballs = append(newFireballs, *fireball)
 		}
 	}
 
-	if len(newFireballs) < len(fireballs) {
-		return newFireballs
-	} else {
+	if len(newFireballs) == len(fireballs) {
 		return fireballs
 	}
+
+	return newFireballs
 }
 
 func CreateFireballs(mergedBodies []Body) Fireballs {
